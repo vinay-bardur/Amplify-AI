@@ -7,3 +7,5 @@ pulp
 pytest
 streamlit
 pmdarima
+pyyaml
+paho-mqtt

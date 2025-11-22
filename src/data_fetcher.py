@@ -2,6 +2,15 @@ import os
 import pandas as pd
 import requests
 from io import StringIO
+import logging
+
+try:
+    from .sensors.ingest import ingest_latest
+    SENSORS_AVAILABLE = True
+except ImportError:
+    SENSORS_AVAILABLE = False
+
+log = logging.getLogger('amplifyai.data_fetcher')
 
 def fetch_nasa_power(lat=15.3647, lon=75.1234):
     try:

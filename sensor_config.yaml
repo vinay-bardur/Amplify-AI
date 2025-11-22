@@ -1,0 +1,14 @@
+sensors:
+  inverter:
+    provider: mock_fronius
+    api_url: "https://api.fronius.example/solar"
+    api_key: null
+  bms:
+    provider: mock_bms
+    connection: "serial:/dev/ttyUSB0"
+  mqtt:
+    enabled: false
+    broker: "localhost"
+    port: 1883
+    topics:
+      - "site/+/telemetry"
