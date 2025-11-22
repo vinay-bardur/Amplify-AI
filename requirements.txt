@@ -6,3 +6,4 @@ altair
 pulp
 pytest
 streamlit
+pmdarima
