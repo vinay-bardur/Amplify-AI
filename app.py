@@ -14,12 +14,11 @@ from src.multi_hour_optimizer import optimize_battery_schedule
 
 st.set_page_config(
     page_title="AmplifyAI - Solar & Battery Intelligence",
-    page_icon="🌞",
     layout="wide"
 )
 
-st.title("🌞 AmplifyAI - Precision Energy Intelligence")
-st.caption("Multi-hour solar forecasting and battery optimization with Apple-level clarity")
+st.title("AmplifyAI")
+st.caption("Precision Energy Intelligence — Multi-hour solar forecasting and battery optimization")
 
 @st.cache_data
 def load_and_train_model():
@@ -46,7 +45,7 @@ st.sidebar.header("Configuration")
 st.sidebar.info(f"**Data Source:** {data_source}")
 st.sidebar.metric("Model MSE", f"{mse:.4f}")
 
-tab1, tab2, tab3 = st.tabs(["📈 Forecast", "⚡ Optimize", "📊 History"])
+tab1, tab2, tab3 = st.tabs(["Forecast", "Optimize", "History"])
 
 with tab1:
     st.header("24-Hour Solar Forecast")
@@ -62,7 +61,7 @@ with tab1:
     with col3:
         lon = st.number_input("Longitude", value=75.1234, format="%.4f")
     
-    if st.button("🔄 Refresh Forecast", type="primary"):
+    if st.button("Refresh Forecast", type="primary"):
         st.cache_data.clear()
         st.rerun()
     
@@ -96,26 +95,26 @@ with tab1:
         title='Solar Production Forecast with Confidence Band'
     )
     
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=None)
     
-    st.info("ℹ️ **Conservative Estimate:** This forecast is based on historical patterns. Always validate with real sensors before taking action.")
+    st.info("Conservative Estimate — This forecast is based on historical patterns. Always validate with real sensors before taking action.")
     
     col1, col2 = st.columns([3, 1])
     
     with col1:
-        st.dataframe(forecast_df[['Hour', 'Mean Forecast (kWh)', 'Uncertainty (kWh)']], use_container_width=True)
+        st.dataframe(forecast_df[['Hour', 'Mean Forecast (kWh)', 'Uncertainty (kWh)']], width='stretch')
     
     with col2:
         csv = forecast_df.to_csv(index=False)
         st.download_button(
-            label="📥 Download CSV",
+            label="Download CSV",
             data=csv,
             file_name=f"solar_forecast_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
             mime="text/csv"
         )
 
 with tab2:
-    st.header("⚡ Multi-Hour Battery Optimization")
+    st.header("Multi-Hour Battery Optimization")
     
     st.markdown("Configure battery parameters and run optimization to schedule charge/discharge actions over the forecast horizon.")
     
@@ -154,7 +153,7 @@ with tab2:
     
     constant_demand = st.number_input("Expected Demand per Hour (kWh)", value=5.0, min_value=0.1)
     
-    if st.button("▶️ Run Optimization", type="primary"):
+    if st.button("Run Optimization", type="primary"):
         forecast_data = forecast_hours(model, df, ['hour', 'ghi', 'temp_c', 'cloud_pct'], n_hours=opt_horizon)
         
         forecast_kwh = forecast_data['mean']
@@ -173,7 +172,7 @@ with tab2:
             )
         
         if result['status'] == 'success':
-            st.success("✅ Optimization completed successfully!")
+            st.success("Optimization completed successfully")
             
             schedule_df = pd.DataFrame({
                 'Hour': forecast_data['hours'],
@@ -194,7 +193,7 @@ with tab2:
                 title='Battery State of Charge Over Time'
             )
             
-            st.altair_chart(soc_chart, use_container_width=True)
+            st.altair_chart(soc_chart, use_container_width=None)
             
             charge_discharge_df = schedule_df[['Hour', 'Charge (kWh)', 'Discharge (kWh)']].melt(
                 id_vars=['Hour'],
@@ -212,9 +211,9 @@ with tab2:
                 title='Charge & Discharge Schedule'
             )
             
-            st.altair_chart(bar_chart, use_container_width=True)
+            st.altair_chart(bar_chart, use_container_width=None)
             
-            st.subheader("📋 Recommended Actions")
+            st.subheader("Recommended Actions")
             
             for idx, row in schedule_df.iterrows():
                 if row['Charge (kWh)'] > 0.1 or row['Discharge (kWh)'] > 0.1:
@@ -230,18 +229,18 @@ with tab2:
             
             csv_schedule = schedule_df.to_csv(index=False)
             st.download_button(
-                label="📥 Export Schedule",
+                label="Export Schedule",
                 data=csv_schedule,
                 file_name=f"battery_schedule_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                 mime="text/csv"
             )
         else:
-            st.error("❌ Optimization failed. Please check your parameters and try again.")
+            st.error("Optimization failed. Please check your parameters and try again.")
 
 with tab3:
-    st.header("📊 Performance History")
+    st.header("Performance History")
     
-    st.warning("🚧 **Preview Mode:** Full historical tracking with database persistence is coming in the next release. Sample data shown below.")
+    st.warning("Preview Mode — Full historical tracking with database persistence is coming in the next release. Sample data shown below.")
     
     st.markdown("""
     **Planned Features:**
@@ -259,7 +258,7 @@ with tab3:
         'Self-Consumption (%)': np.random.uniform(65, 90, 7)
     })
     
-    st.dataframe(sample_history, use_container_width=True)
+    st.dataframe(sample_history, width='stretch')
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### About AmplifyAI")
@@ -271,5 +270,5 @@ st.sidebar.markdown("""
 - Interactive Streamlit UI
 - Conservative confidence estimates
 
-💡 *Always validate recommendations with real sensor data before taking action.*
+*Always validate recommendations with real sensor data before taking action.*
 """)
