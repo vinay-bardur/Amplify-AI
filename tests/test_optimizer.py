@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from optimizer import simple_battery_opt
+from src.optimizer import simple_battery_opt
 
 def test_deficit_scenario():
     result = simple_battery_opt(predicted_kwh=2.0, expected_kwh=5.0, battery_capacity_kwh=50, soc_kwh=20)

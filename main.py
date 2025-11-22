@@ -1,8 +1,10 @@
 import logging
 import sys
-from data_fetcher import fetch_nasa_power, load_sample_data
-from modeling import train_simple_regressor, predict_next
-from optimizer import simple_battery_opt
+import argparse
+
+from src.data_fetcher import fetch_nasa_power, load_sample_data
+from src.modeling import train_simple_regressor, predict_next
+from src.optimizer import simple_battery_opt
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 log = logging.getLogger('AmplifyAI')
@@ -11,7 +13,8 @@ def build_features_from_row(row):
     return [row['hour'], row['ghi'], row['temp_c'], row['cloud_pct']]
 
 
-def main():
+def run_cli():
+    """Phase 1 CLI mode - single hour forecast and optimization"""
     log.info('AmplifyAI starting…')
 
     try:
@@ -74,6 +77,38 @@ def main():
     print(f"Recommendation: {action}")
     print(f"Reason:         {reason}")
     print("="*50 + "\n")
+
+
+def run_streamlit():
+    """Phase 2 Streamlit UI mode - multi-hour forecast and optimization"""
+    import subprocess
+    subprocess.run([sys.executable, "-m", "streamlit", "run", "app.py"])
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='AmplifyAI - Solar Forecasting & Battery Optimization',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  python main.py             # Launch Streamlit UI (default)
+  python main.py --cli       # Run CLI mode (Phase 1)
+  python main.py --help      # Show this help message
+        '''
+    )
+    
+    parser.add_argument(
+        '--cli',
+        action='store_true',
+        help='Run in CLI mode (Phase 1 single-hour forecast)'
+    )
+    
+    args = parser.parse_args()
+    
+    if args.cli:
+        run_cli()
+    else:
+        run_streamlit()
 
 
 if __name__ == '__main__':

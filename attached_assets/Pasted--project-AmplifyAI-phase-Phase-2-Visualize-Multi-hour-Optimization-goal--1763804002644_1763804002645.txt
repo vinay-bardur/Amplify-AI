@@ -1,0 +1,54 @@
+{
+  "project": "AmplifyAI",
+  "phase": "Phase 2 - Visualize & Multi-hour Optimization",
+  "goal": "Upgrade the working CLI engine into a validated product prototype with multi-hour battery optimization, clear metrics, and a minimal Streamlit UI for visualization and control. Preserve the Phase-1 CLI for power users.",
+  "design_philosophy": "Apple-level clarity: every screen and output must be minimal, purposeful, and explainable. The UI is a polished shell around a robust, well-tested engine.",
+  "deliverables": {
+    "ui": "Streamlit app with three tabs: Forecast, Optimize, History",
+    "models": "Linear regression baseline + optional ARIMA placeholder for short-term improvement",
+    "optimizer": "Multi-hour optimization using a small LP (PuLP or scipy) that schedules charge/discharge across a 24-hour horizon subject to battery physics and efficiency",
+    "data": "NASA POWER integration (hourly) + local upload support + CSV import",
+    "tests": "Unit tests for model, optimizer, and data ingestion; integration smoke test for Streamlit endpoints",
+    "docs": "README updated, usage examples, 'how to evaluate' section, demo screenshots"
+  },
+  "ui_spec": {
+    "tab_forecast": {
+      "elements": ["hourly forecast chart (24h)", "confidence band (shaded)", "download CSV"],
+      "controls": ["location (lat/lon)", "horizon (hours)", "refresh"]
+    },
+    "tab_optimize": {
+      "elements": ["interactive inputs (battery capacity, soc, charge/discharge limits, efficiency)", "schedule chart (battery SOC vs time)", "recommended actions list"],
+      "controls": ["run optimization", "scenario presets (rural, urban)", "export schedule"]
+    },
+    "tab_history": {
+      "elements": ["past N days performance", "error statistics (MSE)", "intervention log"]
+    }
+  },
+  "technical_spec": {
+    "frontend": "Streamlit (single-file MVP), progressive enhancement later",
+    "backend": "Python modules retained from Phase-1 (modeling.py, optimizer.py, data_fetcher.py). Streamlit will import these modules.",
+    "optimizer": "Formulate a linear program with variables charge[t], discharge[t], soc[t] for t in horizon. Constraints: soc bounds, charge/discharge rate, energy balance, roundtrip efficiency. Objective: minimize unmet demand OR maximize self-consumption / minimize diesel use (configurable).",
+    "modeling": "Keep LinearRegression baseline; add ARIMA placeholder with clear comments for future upgrade. Provide a function `forecast_hours(n)` returning mean and std.",
+    "data_ingest": "CSV upload widget in Streamlit + NASA POWER fallback. Store recent runs in local SQLite for history.",
+    "tests": "pytest-based unit tests for forecast_hours, optimizer_schedule, data ingestion, and CLI compatibility",
+    "deployment": "Containerize with Dockerfile (optional). Recommend deployment on Render, Fly.io, or Vercel (Streamlit container), with Github Actions for CI running tests."
+  },
+  "milestones": [
+    {"week": 1, "tasks": ["Streamlit skeleton with Forecast tab; hook Phase-1 forecast function; basic plot (matplotlib or altair)"]},
+    {"week": 2, "tasks": ["Implement optimizer LP for multi-hour horizon; expose inputs in Optimize tab; show SOC chart"]},
+    {"week": 3, "tasks": ["CSV upload + NASA API robust parser; history store; unit tests"]},
+    {"week": 4, "tasks": ["Polish UI language, add download, CI + GitHub Actions, prepare demo script"] }
+  ],
+  "acceptance_criteria": [
+    "Streamlit runs locally and shows 24-hour forecast",
+    "Optimizer produces feasible schedule respecting battery constraints",
+    "CSV upload works and data merges with NASA fallback",
+    "Unit tests pass (pytest)",
+    "Readable, one-paragraph explanation appears under each recommendation explaining why that action was chosen"
+  ],
+  "notes": [
+    "Keep dependencies minimal. Use numpy, pandas, scikit-learn, pulp (or scipy.optimize) and streamlit.",
+    "Always show conservative confidence in UI: 'This is an estimate — validate with sensors before action.'",
+    "Keep CLI available as --cli flag to the Streamlit app so power users can still run python main.py --cli"
+  ]
+}
